@@ -18,11 +18,29 @@ function deposit(header, cookieString = '') {
         eatEquals();
         let value = eatValue();
         eatSemicolon();
-        pot.push({ name, value });
+        // pot.push({ name, value });
+        pot = potPush(pot, name, value);
     }
     console.log(pot);
 
     return buildCookieString(pot);
+}
+
+function potPush(pot, name, value) {
+    let newPot = [];
+    pushedAlready = false;
+    for (const cookie of pot) {
+        if (cookie.name === name) {
+            newPot.push({ name, value });
+            pushedAlready = true;
+        } else {
+            newPot.push(cookie);
+        }
+    }
+    if (!pushedAlready) {
+        newPot.push({ name, value });
+    }
+    return newPot;
 }
 
 function buildPotFromCookieString(cookieString) {

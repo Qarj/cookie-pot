@@ -22,6 +22,7 @@ set-cookie: Get=CLEAR; path=/; secure
 set-cookie: _abc=123~0/+=~-1; Domain=.example.com; Path=/; Expires=Wed, 30 Nov 2022 21:46:50 GMT; Max-Age=31536000; Secure`;
 
 const header2 = `server-timing: edge; dur=178
+set-cookie: AUTH=not_authorised; path=/; secure; httponly
 set-cookie: Newone=amaze; path=/; secure`;
 
 describe('cookie-pot', function () {
@@ -50,5 +51,12 @@ describe('cookie-pot', function () {
         const pot1 = pot.deposit(header1);
         const pot2 = pot.deposit(header2, pot1);
         expect(pot2).to.not.contain('  Get=CLEAR');
+    });
+
+    it('replaces existing cookie with latest value', function () {
+        const pot1 = pot.deposit(header1);
+        const pot2 = pot.deposit(header2, pot1);
+        expect(pot2).to.contain('AUTH=not_authorised');
+        expect(pot2).to.not.contain('AUTH=C_r-j');
     });
 });
