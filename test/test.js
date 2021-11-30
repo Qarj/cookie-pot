@@ -21,8 +21,34 @@ set-cookie: AUTH=C_r-j; path=/; secure; httponly
 set-cookie: Get=CLEAR; path=/; secure
 set-cookie: _abc=123~0/+=~-1; Domain=.example.com; Path=/; Expires=Wed, 30 Nov 2022 21:46:50 GMT; Max-Age=31536000; Secure`;
 
+const header2 = `server-timing: edge; dur=178
+set-cookie: Newone=amaze; path=/; secure`;
+
 describe('cookie-pot', function () {
     it('finds a cookie name', function () {
         expect(pot.deposit(header1)).to.contain('LoginCookie=');
+    });
+
+    it('finds two cookie names and values seperated corrected', function () {
+        expect(pot.deposit(header1)).to.contain('LoginCookie=cwZ1; Soft=hqv%2;');
+    });
+
+    it('final value does not end with semicolon', function () {
+        const expected =
+            'LoginCookie=cwZ1; Soft=hqv%2; Anon=Id=22-f.f&Is=False; AUTH=C_r-j; Get=CLEAR; _abc=123~0/+=~-1';
+        expect(pot.deposit(header1)).to.equal(expected);
+    });
+
+    it('appends existing cookies to new cookies', function () {
+        const pot1 = pot.deposit(header1);
+        const pot2 = pot.deposit(header2, pot1);
+        expect(pot2).to.contain('LoginCookie=cwZ1');
+        expect(pot2).to.contain('Newone=amaze');
+    });
+
+    it('should not have a leading space in cookie name', function () {
+        const pot1 = pot.deposit(header1);
+        const pot2 = pot.deposit(header2, pot1);
+        expect(pot2).to.not.contain('  Get=CLEAR');
     });
 });

@@ -2,15 +2,18 @@ let length = 0;
 let pos = 0;
 let text = '';
 
-function deposit(header, pot = []) {
+function deposit(header, cookieString = '') {
+    let pot = buildPotFromCookieString(cookieString);
+
     length = header.length;
     pos = 0;
     text = header;
 
     while (pos < length) {
-        if (!eatLenient('set-cookie: ')) {
+        if (!eatLenient('set-cookie:')) {
             break;
         }
+        eatWhitespace();
         let name = eatName();
         eatEquals();
         let value = eatValue();
@@ -20,6 +23,26 @@ function deposit(header, pot = []) {
     console.log(pot);
 
     return buildCookieString(pot);
+}
+
+function buildPotFromCookieString(cookieString) {
+    if (cookieString.length > 1) {
+        cookieString += ';';
+    }
+    text = cookieString;
+    length = text.length;
+    pos = 0;
+
+    let pot = [];
+    while (pos < length) {
+        eatWhitespace();
+        let name = eatName();
+        eatEquals();
+        let value = eatValue();
+        pot.push({ name, value });
+        eatSemicolon();
+    }
+    return pot;
 }
 
 function eatLenient(target) {
@@ -32,6 +55,16 @@ function eatLenient(target) {
         pos += 1;
     }
     return false;
+}
+
+function eatWhitespace() {
+    while (pos < length) {
+        if (text[pos] === ' ') {
+            pos += 1;
+        } else {
+            return;
+        }
+    }
 }
 
 function eatName() {
