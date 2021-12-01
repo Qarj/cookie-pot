@@ -8,8 +8,8 @@ Cookie jar style helper function for node HTTP requests
 const pot = require('cookie-pot');
 
 let cookiePot = pot.deposit(responseHeader1String);
-pot.deposit(responseHeader2String, cookiePot);
-pot.deposit(responseHeader3String, cookiePot);
+cookiePot = pot.deposit(responseHeader2String, cookiePot);
+cookiePot = pot.deposit(responseHeader3String, cookiePot);
 ```
 
 The cookie-pot will
