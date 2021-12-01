@@ -20,7 +20,6 @@ function deposit(header, cookieString = '') {
         eatSemicolon();
         pot = potPush(pot, name, value);
     }
-    console.log(pot);
 
     return buildCookieString(pot);
 }
@@ -139,7 +138,6 @@ function buildCookieString(pot) {
     if (cookieString.length > 0) {
         cookieString = cookieString.substring(0, cookieString.length - 2);
     }
-    console.log(cookieString);
     return cookieString;
 }
 
