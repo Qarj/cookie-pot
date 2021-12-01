@@ -1,6 +1,6 @@
 {
     "name": "cookie-pot",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Cookie jar style helper function for node HTTP requests",
     "main": "index.js",
     "scripts": {

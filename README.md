@@ -7,9 +7,9 @@ Cookie jar style helper function for node HTTP requests
 ```js
 const pot = require('cookie-pot');
 
-let cookiePot = pot.deposit(responseHeader1String);
-cookiePot = pot.deposit(responseHeader2String, cookiePot);
-cookiePot = pot.deposit(responseHeader3String, cookiePot);
+let cookiePot = pot.deposit(response1);
+cookiePot = pot.deposit(response2, cookiePot);
+cookiePot = pot.deposit(response3, cookiePot);
 ```
 
 The cookie-pot will
@@ -19,3 +19,27 @@ The cookie-pot will
 -   remove cookies if the value is set to the empty string
 
 The `cookiePot` string can be used for the `cookie` request header verbatim.
+
+# Supported responses
+
+cookie-pot currently understands response header strings that look like
+
+```
+content-length: 29384
+setcookie: mycookie=123; expires=Wed, 30 Nov 2022 00:00:00 GMT; path=/; secure
+setcookie: LANG=en; expires=Wed, 30 Nov 2022 00:00:00 GMT;
+```
+
+cookie-pot also understands request responses that includes a headers key that looks like
+
+```js
+    headers: {
+        'date': 'Wed, 01 Dec 2021 10:23:43 GMT',
+        'content-type': 'text/html;charset=UTF-8',
+        'content-length': '362212',
+        'set-cookie': [
+            'id=2a9;Path=/;Expires=Tue, 21-Dec-2021 12:01:46 UTC;HttpOnly;Secure',
+            'HASH=f5c8;Path=/;Expires=Thu, 01-Dec-2022 10:23:42 UTC',
+        ],
+    },
+```

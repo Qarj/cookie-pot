@@ -2,12 +2,14 @@ let length = 0;
 let pos = 0;
 let text = '';
 
-function deposit(header, cookieString = '') {
+function deposit(headers, cookieString = '') {
     let pot = buildPotFromCookieString(cookieString);
 
-    length = header.length;
+    headers = normaliseHeaders(headers);
+
+    length = headers.length;
     pos = 0;
-    text = header;
+    text = headers;
 
     while (pos < length) {
         if (!eatLenient('set-cookie:')) {
@@ -22,6 +24,35 @@ function deposit(header, cookieString = '') {
     }
 
     return buildCookieString(pot);
+}
+
+function normaliseHeaders(headers) {
+    type = typeof headers;
+    if (type === 'string') {
+        return headers;
+    }
+    if (type === 'object') {
+        return normaliseOjbectHeaders(headers);
+    }
+    throw `Headers object of ${type} is not supported.`;
+}
+
+function normaliseOjbectHeaders(headers) {
+    if (headers.hasOwnProperty('headers')) {
+        return stringifyRequestResponseHeaders(headers);
+    }
+    throw 'Headers object is unknown and not supported.';
+}
+
+function stringifyRequestResponseHeaders(headers) {
+    stringified = '';
+    if (headers.headers.hasOwnProperty('set-cookie')) {
+        const setCookie = headers.headers['set-cookie'];
+        for (const cookie of setCookie) {
+            stringified += 'set-cookie: ' + cookie;
+        }
+    }
+    return stringified;
 }
 
 function potPush(pot, name, value) {

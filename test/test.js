@@ -31,6 +31,32 @@ set-cookie: Newone=amaze; path=/; secure`;
 
 const header4 = `server-timing: edge; dur=178`;
 
+const requestResponse1 = {
+    headers: {
+        'date': 'Wed, 01 Dec 2021 10:23:43 GMT',
+        'content-type': 'text/html;charset=UTF-8',
+        'content-length': '362212',
+        'set-cookie': [
+            'id=2a9;Path=/;Expires=Tue, 21-Dec-2021 12:01:46 UTC;HTTPOnly;HttpOnly;Secure',
+            'HASH=f5c8;Path=/;Expires=Thu, 01-Dec-2022 10:23:42 UTC',
+            'X-TOKEN=pjb;Path=/;Secure',
+            'UX=value1;Path=/;Expires=Fri, 31-Dec-2021 10:23:42 UTC',
+            'UX=value2;Path=/;Expires=Fri, 31-Dec-2021 10:23:42 UTC',
+            'LANG=de;Path=/;Expires=Thu, 30-Nov-2051 18:15:12 UTC',
+            'LANG=de;Path=/;Expires=Thu, 01-Dec-2022 10:23:42 UTC',
+            'AUTH=;Path=/;Expires=Wed, 01-Dec-2021 10:23:42 UTC',
+        ],
+    },
+};
+
+const requestResponse2 = {
+    headers: {
+        'date': 'Wed, 01 Dec 2021 10:23:43 GMT',
+        'content-type': 'text/html;charset=UTF-8',
+        'content-length': '362212',
+    },
+};
+
 describe('cookie-pot', function () {
     it('finds a cookie name', function () {
         expect(pot.deposit(header1)).to.contain('LoginCookie=');
@@ -75,6 +101,16 @@ describe('cookie-pot', function () {
 
     it('handles a header that does not set a cookie', function () {
         const pot1 = pot.deposit(header4);
+        expect(pot1).to.equal('');
+    });
+
+    it('handles a request response', function () {
+        const pot1 = pot.deposit(requestResponse1);
+        expect(pot1).to.contain('X-TOKEN=pjb;');
+    });
+
+    it('handles a request response that contains no set-cookie headers', function () {
+        const pot1 = pot.deposit(requestResponse2);
         expect(pot1).to.equal('');
     });
 });
