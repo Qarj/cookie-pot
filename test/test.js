@@ -25,6 +25,10 @@ const header2 = `server-timing: edge; dur=178
 set-cookie: AUTH=not_authorised; path=/; secure; httponly
 set-cookie: Newone=amaze; path=/; secure`;
 
+const header3 = `server-timing: edge; dur=178
+set-cookie: AUTH=; path=/; secure; httponly
+set-cookie: Newone=amaze; path=/; secure`;
+
 describe('cookie-pot', function () {
     it('finds a cookie name', function () {
         expect(pot.deposit(header1)).to.contain('LoginCookie=');
@@ -58,5 +62,12 @@ describe('cookie-pot', function () {
         const pot2 = pot.deposit(header2, pot1);
         expect(pot2).to.contain('AUTH=not_authorised');
         expect(pot2).to.not.contain('AUTH=C_r-j');
+    });
+
+    it('deletes existing cookie with empty value', function () {
+        const pot1 = pot.deposit(header1);
+        expect(pot1).to.contain('AUTH=C_r-j');
+        const pot2 = pot.deposit(header3, pot1);
+        expect(pot2).to.not.contain('AUTH=');
     });
 });

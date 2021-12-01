@@ -18,7 +18,6 @@ function deposit(header, cookieString = '') {
         eatEquals();
         let value = eatValue();
         eatSemicolon();
-        // pot.push({ name, value });
         pot = potPush(pot, name, value);
     }
     console.log(pot);
@@ -31,16 +30,23 @@ function potPush(pot, name, value) {
     pushedAlready = false;
     for (const cookie of pot) {
         if (cookie.name === name) {
-            newPot.push({ name, value });
+            newPot = pushValue(newPot, name, value);
             pushedAlready = true;
         } else {
             newPot.push(cookie);
         }
     }
     if (!pushedAlready) {
-        newPot.push({ name, value });
+        newPot = pushValue(newPot, name, value);
     }
     return newPot;
+}
+
+function pushValue(pot, name, value) {
+    if (value.length > 0) {
+        pot.push({ name, value });
+    }
+    return pot;
 }
 
 function buildPotFromCookieString(cookieString) {
@@ -94,7 +100,7 @@ function eatName() {
         name += text[pos];
         pos += 1;
     }
-    throw 'Cookie name must end with an equals sign.';
+    throw `Cookie name must end with an equals sign at position ${pos}.`;
 }
 
 function eatEquals() {
@@ -102,7 +108,7 @@ function eatEquals() {
         pos += 1;
         return;
     }
-    throw 'Expected equals sign.';
+    throw `Expected equals sign at position ${pos}.`;
 }
 
 function eatValue() {
@@ -114,7 +120,7 @@ function eatValue() {
         value += text[pos];
         pos += 1;
     }
-    throw 'Cookie value must end with a semicolon.';
+    throw `Cookie value must end with a semicolon at position ${pos}.`;
 }
 
 function eatSemicolon() {
@@ -122,7 +128,7 @@ function eatSemicolon() {
         pos += 1;
         return;
     }
-    throw 'Expected semicolon.';
+    throw `Expected semicolon at position ${pos}.`;
 }
 
 function buildCookieString(pot) {
