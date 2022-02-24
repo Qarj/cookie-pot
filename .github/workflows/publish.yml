@@ -49,8 +49,7 @@ jobs:
                   VALIDATE_YAML: false
 
     publish:
-        needs: test
-        needs: super-lint
+        needs: [test, super-lint]
         name: Publish to npmjs
         runs-on: ubuntu-latest
         steps:
