@@ -2,10 +2,11 @@
 
 [![GitHub Super-Linter](https://github.com/Qarj/cookie-pot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 ![Tests](https://github.com/Qarj/cookie-pot/workflows/Tests/badge.svg)
+![Publish to npmjs](https://github.com/Qarj/cookie-pot/workflows/Publish%20to%20npmjs/badge.svg)
 
-Cookie jar style helper function for node HTTP requests
+Cookie jar style helper function for Node.js HTTP requests
 
-# Usage
+## Usage
 
 ```js
 const pot = require('cookie-pot');
@@ -23,11 +24,11 @@ The cookie-pot will
 
 The `cookiePot` string can be used for the `cookie` request header verbatim.
 
-# Supported responses
+## Supported responses
 
 cookie-pot currently understands response header strings that look like
 
-```
+```lang-text
 content-length: 29384
 setcookie: mycookie=123; expires=Wed, 30 Nov 2022 00:00:00 GMT; path=/; secure
 setcookie: LANG=en; expires=Wed, 30 Nov 2022 00:00:00 GMT;
