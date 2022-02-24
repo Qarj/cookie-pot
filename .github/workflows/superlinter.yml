@@ -23,7 +23,8 @@ jobs:
             - name: Lint Code Base
               uses: github/super-linter@v4
               env:
-                  VALIDATE_YAML: false
                   DEFAULT_BRANCH: main
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  JAVASCRIPT_DEFAULT_STYLE: prettier
                   LINTER_RULES_PATH: /
+                  VALIDATE_YAML: false
