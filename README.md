@@ -1,5 +1,8 @@
 # cookie-pot
 
+[![GitHub Super-Linter](https://github.com/Qarj/cookie-pot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![Tests](https://github.com/Qarj/cookie-pot/workflows/Tests/badge.svg)
+
 Cookie jar style helper function for node HTTP requests
 
 # Usage
