@@ -40,6 +40,7 @@ const requestResponse1 = {
             'id=2a9;Path=/;Expires=Tue, 21-Dec-2021 12:01:46 UTC;HTTPOnly;HttpOnly;Secure',
             'HASH=f5c8;Path=/;Expires=Thu, 01-Dec-2022 10:23:42 UTC',
             'X-TOKEN=pjb;Path=/;Secure',
+            '.AspNetCore.Antiforgery.nUm79WDWtTU=xyz;Path=/;Secure',
             'UX=value1;Path=/;Expires=Fri, 31-Dec-2021 10:23:42 UTC',
             'UX=value2;Path=/;Expires=Fri, 31-Dec-2021 10:23:42 UTC',
             'LANG=de;Path=/;Expires=Thu, 30-Nov-2051 18:15:12 UTC',
@@ -118,5 +119,11 @@ describe('cookie-pot', function () {
         const pot1 = pot.deposit(requestResponse1);
         const token = pot.getCookie('X-TOKEN', pot1);
         expect(token).to.equal('pjb');
+    });
+
+    it('can get a cookie value by partial cookie name', function () {
+        const pot1 = pot.deposit(requestResponse1);
+        const token = pot.getCookie('Antiforgery', pot1);
+        expect(token).to.equal('xyz');
     });
 });

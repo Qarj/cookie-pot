@@ -33,6 +33,12 @@ function getCookie(name, cookieString) {
             return cookie.value;
         }
     }
+    for (const cookie of pot) {
+        if (cookie.name.includes(name)) {
+            return cookie.value;
+        }
+    }
+
     return '';
 }
 

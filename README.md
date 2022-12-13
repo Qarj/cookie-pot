@@ -30,6 +30,8 @@ To get a single cookie value from the cookiePot
 const myCookie = pot.getCookie('myCookie', cookiePot);
 ```
 
+If an exact match is not found, cookie-pot will return the first cookie that includes the given name.
+
 ## Supported responses
 
 cookie-pot currently understands response header strings that look like
