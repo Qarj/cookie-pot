@@ -1,7 +1,11 @@
 const assert = require('assert');
-const pot = require('../index');
 const chai = require('chai'); // https://www.chaijs.com/
 var expect = chai.expect;
+const pot = require('../index'); // clears out the pot
+
+beforeEach(function () {
+    pot.clear();
+});
 
 describe('Hello', function () {
     it('says hello', function () {
@@ -74,56 +78,65 @@ describe('cookie-pot', function () {
     });
 
     it('appends existing cookies to new cookies', function () {
-        const pot1 = pot.deposit(header1);
-        const pot2 = pot.deposit(header2, pot1);
-        expect(pot2).to.contain('LoginCookie=cwZ1');
-        expect(pot2).to.contain('Newone=amaze');
+        pot.deposit(header1);
+        const cookieString1 = pot.deposit(header2);
+        expect(cookieString1).to.contain('LoginCookie=cwZ1');
+        expect(cookieString1).to.contain('Newone=amaze');
     });
 
     it('should not have a leading space in cookie name', function () {
-        const pot1 = pot.deposit(header1);
-        const pot2 = pot.deposit(header2, pot1);
-        expect(pot2).to.not.contain('  Get=CLEAR');
+        pot.deposit(header1);
+        const cookieString = pot.deposit(header2);
+        expect(cookieString).to.not.contain('  Get=CLEAR');
     });
 
     it('replaces existing cookie with latest value', function () {
-        const pot1 = pot.deposit(header1);
-        const pot2 = pot.deposit(header2, pot1);
-        expect(pot2).to.contain('AUTH=not_authorised');
-        expect(pot2).to.not.contain('AUTH=C_r-j');
+        pot.deposit(header1);
+        const cookieString = pot.deposit(header2);
+        expect(cookieString).to.contain('AUTH=not_authorised');
+        expect(cookieString).to.not.contain('AUTH=C_r-j');
     });
 
     it('deletes existing cookie with empty value', function () {
-        const pot1 = pot.deposit(header1);
-        expect(pot1).to.contain('AUTH=C_r-j');
-        const pot2 = pot.deposit(header3, pot1);
-        expect(pot2).to.not.contain('AUTH=');
+        const cookieString1 = pot.deposit(header1);
+        expect(cookieString1).to.contain('AUTH=C_r-j');
+        const cookieString2 = pot.deposit(header3);
+        expect(cookieString2).to.not.contain('AUTH=');
     });
 
     it('handles a header that does not set a cookie', function () {
-        const pot1 = pot.deposit(header4);
-        expect(pot1).to.equal('');
+        const cookieString = pot.deposit(header4);
+        expect(cookieString).to.equal('');
     });
 
     it('handles a request response', function () {
-        const pot1 = pot.deposit(requestResponse1);
-        expect(pot1).to.contain('X-TOKEN=pjb;');
+        const cookieString = pot.deposit(requestResponse1);
+        expect(cookieString).to.contain('X-TOKEN=pjb;');
     });
 
     it('handles a request response that contains no set-cookie headers', function () {
-        const pot1 = pot.deposit(requestResponse2);
-        expect(pot1).to.equal('');
+        const cookieString = pot.deposit(requestResponse2);
+        expect(cookieString).to.equal('');
     });
 
     it('can get a cookie value', function () {
-        const pot1 = pot.deposit(requestResponse1);
-        const token = pot.getCookie('X-TOKEN', pot1);
+        pot.deposit(requestResponse1);
+        const token = pot.getCookie('X-TOKEN');
         expect(token).to.equal('pjb');
     });
 
     it('can get a cookie value by partial cookie name', function () {
-        const pot1 = pot.deposit(requestResponse1);
-        const token = pot.getCookie('Antiforgery', pot1);
+        pot.deposit(requestResponse1);
+        const token = pot.getCookie('Antiforgery');
         expect(token).to.equal('xyz');
     });
+
+    // it('can have separate pots', function () {
+    //     pot.deposit(requestResponse1);
+    //     const token = pot.getCookie('Antiforgery');
+    //     expect(token).to.equal('xyz');
+    //     const pot2 = new CookiePot();
+    //     pot2.deposit(header3);
+    //     expect(pot2.getCookie('Antiforgery')).to.equal('');
+    // });
 });

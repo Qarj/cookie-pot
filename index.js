@@ -1,10 +1,18 @@
-let length = 0;
-let pos = 0;
-let text = '';
+let length;
+let pos;
+let text;
+let pot;
 
-function deposit(headers, cookieString = '') {
-    let pot = buildPotFromCookieString(cookieString);
+clear();
 
+function clear() {
+    length = 0;
+    pos = 0;
+    text = '';
+    pot = [];
+}
+
+function deposit(headers) {
     headers = normaliseHeaders(headers);
 
     length = headers.length;
@@ -20,14 +28,13 @@ function deposit(headers, cookieString = '') {
         eatEquals();
         let value = eatValue();
         eatSemicolon();
-        pot = potPush(pot, name, value);
+        potPush(name, value);
     }
 
-    return buildCookieString(pot);
+    return buildCookieString();
 }
 
-function getCookie(name, cookieString) {
-    pot = buildPotFromCookieString(cookieString);
+function getCookie(name) {
     for (const cookie of pot) {
         if (cookie.name === name) {
             return cookie.value;
@@ -71,7 +78,7 @@ function stringifyRequestResponseHeaders(headers) {
     return stringified;
 }
 
-function potPush(pot, name, value) {
+function potPush(name, value) {
     let newPot = [];
     pushedAlready = false;
     for (const cookie of pot) {
@@ -85,14 +92,14 @@ function potPush(pot, name, value) {
     if (!pushedAlready) {
         newPot = pushValue(newPot, name, value);
     }
-    return newPot;
+    pot = newPot;
 }
 
-function pushValue(pot, name, value) {
+function pushValue(_pot, name, value) {
     if (value.length > 0) {
-        pot.push({ name, value });
+        _pot.push({ name, value });
     }
-    return pot;
+    return _pot;
 }
 
 function buildPotFromCookieString(cookieString) {
@@ -103,7 +110,7 @@ function buildPotFromCookieString(cookieString) {
     length = text.length;
     pos = 0;
 
-    let pot = [];
+    pot = [];
     while (pos < length) {
         eatWhitespace();
         let name = eatName();
@@ -112,7 +119,6 @@ function buildPotFromCookieString(cookieString) {
         pot.push({ name, value });
         eatSemicolon();
     }
-    return pot;
 }
 
 function eatLenient(target) {
@@ -177,7 +183,7 @@ function eatSemicolon() {
     throw `Expected semicolon at position ${pos}.`;
 }
 
-function buildCookieString(pot) {
+function buildCookieString() {
     let cookieString = '';
     for (const cookie of pot) {
         cookieString += cookie.name + '=' + cookie.value + '; ';
@@ -193,6 +199,7 @@ function world() {
 }
 
 module.exports = {
+    clear,
     deposit,
     getCookie,
     world,

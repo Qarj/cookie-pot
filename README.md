@@ -11,9 +11,11 @@ Cookie jar style helper function for Node.js HTTP requests
 ```js
 const pot = require('cookie-pot');
 
-let cookiePot = pot.deposit(response1);
-cookiePot = pot.deposit(response2, cookiePot);
-cookiePot = pot.deposit(response3, cookiePot);
+let cookieString = pot.deposit(response1);
+pot.deposit(response2);
+pot.deposit(response3);
+
+pot.getCookieString();
 ```
 
 The cookie-pot will
@@ -27,10 +29,16 @@ The `cookiePot` string can be used for the `cookie` request header verbatim.
 To get a single cookie value from the cookiePot
 
 ```js
-const myCookie = pot.getCookie('myCookie', cookiePot);
+const myCookie = pot.getCookie('myCookie');
 ```
 
 If an exact match is not found, cookie-pot will return the first cookie that includes the given name.
+
+To clear the contents of the cookie pot
+
+```js
+pot.clear();
+```
 
 ## Supported responses
 
@@ -55,3 +63,7 @@ cookie-pot also understands request responses that includes a headers key that l
         ],
     },
 ```
+
+Known to work with
+
+-   axios
