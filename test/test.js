@@ -113,4 +113,10 @@ describe('cookie-pot', function () {
         const pot1 = pot.deposit(requestResponse2);
         expect(pot1).to.equal('');
     });
+
+    it('can get a cookie value', function () {
+        const pot1 = pot.deposit(requestResponse1);
+        const token = pot.getCookie('X-TOKEN', pot1);
+        expect(token).to.equal('pjb');
+    });
 });

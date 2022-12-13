@@ -26,6 +26,16 @@ function deposit(headers, cookieString = '') {
     return buildCookieString(pot);
 }
 
+function getCookie(name, cookieString) {
+    pot = buildPotFromCookieString(cookieString);
+    for (const cookie of pot) {
+        if (cookie.name === name) {
+            return cookie.value;
+        }
+    }
+    return '';
+}
+
 function normaliseHeaders(headers) {
     type = typeof headers;
     if (type === 'string') {
@@ -178,5 +188,6 @@ function world() {
 
 module.exports = {
     deposit,
+    getCookie,
     world,
 };

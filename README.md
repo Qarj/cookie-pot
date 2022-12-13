@@ -24,6 +24,12 @@ The cookie-pot will
 
 The `cookiePot` string can be used for the `cookie` request header verbatim.
 
+To get a single cookie value from the cookiePot
+
+```js
+const myCookie = pot.getCookie('myCookie', cookiePot);
+```
+
 ## Supported responses
 
 cookie-pot currently understands response header strings that look like
