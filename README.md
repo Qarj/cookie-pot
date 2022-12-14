@@ -103,3 +103,38 @@ const signinResponse = await axios.post(signinUrl, signinPayload, {
 
 pot.deposit(signinResponse);
 ```
+
+## Superagent example
+
+```js
+const superagent = require('superagent');
+const CookiePot = require('cookie-pot');
+
+const pot = new CookiePot();
+
+const signinUrl = `https://www.example.com/Account/SignIn`;
+const userAgent = 'My User Agent';
+const signinPage = await superagent.get(signinUrl).set('User-Agent', userAgent);
+
+pot.deposit(signinPage);
+
+const requestVerificationToken = pot.getCookie('Antiforgery');
+const signinPayload = `email=example%40example.com&Password=12345&__RequestVerificationToken=${requestVerificationToken}`;
+
+// superagent treats a redirect as an error, we need to catch it since the login cookies
+// are only set in the redirect response and not the final response
+let signinResponse;
+try {
+    signinResponse = await superagent
+        .post(signinUrl)
+        .redirects(0)
+        .set('Content-Type', 'application/x-www-form-urlencoded')
+        .set('Cookie', pot.getCookieString())
+        .set('User-Agent', userAgent)
+        .send(signinPayload);
+} catch (error) {
+    signinResponse = error.response;
+}
+
+pot.deposit(signinResponse);
+```
