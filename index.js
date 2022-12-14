@@ -6,6 +6,25 @@ class CookiePot {
         this.text = '';
     }
 
+    buildPotFromCookieString(cookieString) {
+        if (cookieString.length > 1) {
+            cookieString += ';';
+        }
+        this.text = cookieString;
+        this.length = this.text.length;
+        this.pos = 0;
+
+        this.pot = [];
+        while (this.pos < this.length) {
+            this.#eatWhitespace();
+            let name = this.#eatName();
+            this.#eatEquals();
+            let value = this.#eatValue();
+            this.pot.push({ name, value });
+            this.#eatSemicolon();
+        }
+    }
+
     clear() {
         this.length = 0;
         this.pos = 0;
@@ -14,25 +33,25 @@ class CookiePot {
     }
 
     deposit(headers) {
-        headers = this.normaliseHeaders(headers);
+        headers = this.#normaliseHeaders(headers);
 
         this.length = headers.length;
         this.pos = 0;
         this.text = headers;
 
         while (this.pos < this.length) {
-            if (!this.eatLenient('set-cookie:')) {
+            if (!this.#eatLenient('set-cookie:')) {
                 break;
             }
-            this.eatWhitespace();
-            let name = this.eatName();
-            this.eatEquals();
-            let value = this.eatValue();
-            this.eatSemicolon();
-            this.potPush(name, value);
+            this.#eatWhitespace();
+            let name = this.#eatName();
+            this.#eatEquals();
+            let value = this.#eatValue();
+            this.#eatSemicolon();
+            this.#potPush(name, value);
         }
 
-        return this.buildCookieString();
+        return this.#buildCookieString();
     }
 
     getCookie(name) {
@@ -51,28 +70,28 @@ class CookiePot {
     }
 
     getCookieString() {
-        return this.buildCookieString();
+        return this.#buildCookieString();
     }
 
-    normaliseHeaders(headers) {
+    #normaliseHeaders(headers) {
         const type = typeof headers;
         if (type === 'string') {
             return headers;
         }
         if (type === 'object') {
-            return this.normaliseObjectHeaders(headers);
+            return this.#normaliseObjectHeaders(headers);
         }
         throw `Headers object of ${type} is not supported.`;
     }
 
-    normaliseObjectHeaders(headers) {
+    #normaliseObjectHeaders(headers) {
         if (headers.hasOwnProperty('headers')) {
-            return this.stringifyRequestResponseHeaders(headers);
+            return this.#stringifyRequestResponseHeaders(headers);
         }
         throw 'Headers object is unknown and not supported.';
     }
 
-    stringifyRequestResponseHeaders(headers) {
+    #stringifyRequestResponseHeaders(headers) {
         let stringified = '';
         if (headers.headers.hasOwnProperty('set-cookie')) {
             const setCookie = headers.headers['set-cookie'];
@@ -83,50 +102,31 @@ class CookiePot {
         return stringified;
     }
 
-    potPush(name, value) {
+    #potPush(name, value) {
         let newPot = [];
         let pushedAlready = false;
         for (const cookie of this.pot) {
             if (cookie.name === name) {
-                newPot = this.pushValue(newPot, name, value);
+                newPot = this.#pushValue(newPot, name, value);
                 pushedAlready = true;
             } else {
                 newPot.push(cookie);
             }
         }
         if (!pushedAlready) {
-            newPot = this.pushValue(newPot, name, value);
+            newPot = this.#pushValue(newPot, name, value);
         }
         this.pot = newPot;
     }
 
-    pushValue(_pot, name, value) {
+    #pushValue(_pot, name, value) {
         if (value.length > 0) {
             _pot.push({ name, value });
         }
         return _pot;
     }
 
-    buildPotFromCookieString(cookieString) {
-        if (cookieString.length > 1) {
-            cookieString += ';';
-        }
-        this.text = cookieString;
-        this.length = this.text.length;
-        this.pos = 0;
-
-        this.pot = [];
-        while (this.pos < this.length) {
-            this.eatWhitespace();
-            let name = this.eatName();
-            this.eatEquals();
-            let value = this.eatValue();
-            this.pot.push({ name, value });
-            this.eatSemicolon();
-        }
-    }
-
-    eatLenient(target) {
+    #eatLenient(target) {
         while (this.pos < this.length) {
             let current = this.text.substring(this.pos, this.pos + target.length);
             if (current === target) {
@@ -138,7 +138,7 @@ class CookiePot {
         return false;
     }
 
-    eatWhitespace() {
+    #eatWhitespace() {
         while (this.pos < this.length) {
             if (this.text[this.pos] === ' ') {
                 this.pos += 1;
@@ -148,7 +148,7 @@ class CookiePot {
         }
     }
 
-    eatName() {
+    #eatName() {
         let name = '';
         while (this.pos < this.length) {
             if (this.text[this.pos] === '=') {
@@ -160,7 +160,7 @@ class CookiePot {
         throw `Cookie name must end with an equals sign at position ${this.pos}.`;
     }
 
-    eatEquals() {
+    #eatEquals() {
         if (this.text[this.pos] === '=') {
             this.pos += 1;
             return;
@@ -168,7 +168,7 @@ class CookiePot {
         throw `Expected equals sign at position ${this.pos}.`;
     }
 
-    eatValue() {
+    #eatValue() {
         let value = '';
         while (this.pos < this.length) {
             if (this.text[this.pos] === ';') {
@@ -180,7 +180,7 @@ class CookiePot {
         throw `Cookie value must end with a semicolon at position ${this.pos}.`;
     }
 
-    eatSemicolon() {
+    #eatSemicolon() {
         if (this.text[this.pos] === ';') {
             this.pos += 1;
             return;
@@ -188,7 +188,7 @@ class CookiePot {
         throw `Expected semicolon at position ${this.pos}.`;
     }
 
-    buildCookieString() {
+    #buildCookieString() {
         let cookieString = '';
         for (const cookie of this.pot) {
             cookieString += cookie.name + '=' + cookie.value + '; ';
