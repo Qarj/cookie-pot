@@ -9,7 +9,9 @@ Cookie jar style helper function for Node.js HTTP requests
 ## Usage
 
 ```js
-const pot = require('cookie-pot');
+const CookiePot = require('cookie-pot');
+
+const pot = new CookiePot();
 
 let cookieString = pot.deposit(response1);
 pot.deposit(response2);
@@ -18,13 +20,13 @@ pot.deposit(response3);
 pot.getCookieString();
 ```
 
-The cookie-pot will
+CookiePot will
 
 -   merge in new cookies from the response header strings
 -   update the values of existing cookies
 -   remove cookies if the value is set to the empty string
 
-The `cookiePot` string can be used for the `cookie` request header verbatim.
+The `cookieString` string returned by the `deposit` and `getCookieString` methods can be used for the `cookie` request header verbatim.
 
 To get a single cookie value from the cookiePot
 
@@ -32,7 +34,7 @@ To get a single cookie value from the cookiePot
 const myCookie = pot.getCookie('myCookie');
 ```
 
-If an exact match is not found, cookie-pot will return the first cookie that includes the given name.
+If an exact match is not found, CookiePot will return the first cookie that includes the given name.
 
 To clear the contents of the cookie pot
 
@@ -42,7 +44,7 @@ pot.clear();
 
 ## Supported responses
 
-cookie-pot currently understands response header strings that look like
+CookiePot currently understands response header strings that look like
 
 ```lang-text
 content-length: 29384
@@ -50,7 +52,7 @@ setcookie: mycookie=123; expires=Wed, 30 Nov 2022 00:00:00 GMT; path=/; secure
 setcookie: LANG=en; expires=Wed, 30 Nov 2022 00:00:00 GMT;
 ```
 
-cookie-pot also understands request responses that includes a headers key that looks like
+CookiePot also understands request responses that includes a headers key that looks like (as returned by Axios)
 
 ```js
     headers: {
@@ -63,7 +65,3 @@ cookie-pot also understands request responses that includes a headers key that l
         ],
     },
 ```
-
-Known to work with
-
--   axios

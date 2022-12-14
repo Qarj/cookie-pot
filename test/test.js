@@ -139,5 +139,8 @@ describe('cookie-pot', function () {
         const pot2 = new CookiePot();
         pot2.deposit(header3);
         expect(pot2.getCookie('Antiforgery')).to.equal('');
+        expect(pot2.getCookie('Newone')).to.equal('amaze');
+        expect(pot.getCookie('Antiforgery')).to.equal('xyz');
+        expect(pot.getCookie('Newone')).to.equal('');
     });
 });
