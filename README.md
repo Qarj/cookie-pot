@@ -9,32 +9,50 @@ Cookie jar style helper function for Node.js HTTP requests
 ## Usage
 
 ```js
-const pot = require('cookie-pot');
+const CookiePot = require('cookie-pot');
 
-let cookiePot = pot.deposit(response1);
-cookiePot = pot.deposit(response2, cookiePot);
-cookiePot = pot.deposit(response3, cookiePot);
+const pot = new CookiePot();
+
+let cookieString = pot.deposit(response1);
+pot.deposit(response2);
+pot.deposit(response3);
+
+pot.getCookieString();
 ```
 
-The cookie-pot will
+CookiePot will
 
 -   merge in new cookies from the response header strings
 -   update the values of existing cookies
 -   remove cookies if the value is set to the empty string
 
-The `cookiePot` string can be used for the `cookie` request header verbatim.
+The `cookieString` string returned by the `deposit` and `getCookieString` methods can be used for the `cookie` request header verbatim.
 
 To get a single cookie value from the cookiePot
 
 ```js
-const myCookie = pot.getCookie('myCookie', cookiePot);
+const myCookie = pot.getCookie('myCookie');
 ```
 
-If an exact match is not found, cookie-pot will return the first cookie that includes the given name.
+If an exact match is not found, CookiePot will return the first cookie that includes the given name.
+
+To clear the contents of the cookie pot
+
+```js
+pot.clear();
+```
+
+A cookie pot can be built from an existing cookie string (will wipe the existing content)
+
+```js
+const cookieString = 'id=2a9; X-TOKEN=pjb; .AspNetCore.Antiforgery.nUm79WDWtTU=xyz; LANG=de';
+const pot = new CookiePot();
+pot.buildPotFromCookieString(cookieString);
+```
 
 ## Supported responses
 
-cookie-pot currently understands response header strings that look like
+CookiePot currently understands response header strings that look like
 
 ```lang-text
 content-length: 29384
@@ -42,7 +60,7 @@ setcookie: mycookie=123; expires=Wed, 30 Nov 2022 00:00:00 GMT; path=/; secure
 setcookie: LANG=en; expires=Wed, 30 Nov 2022 00:00:00 GMT;
 ```
 
-cookie-pot also understands request responses that includes a headers key that looks like
+CookiePot also understands request responses that includes a headers key that looks like (as returned by Axios)
 
 ```js
     headers: {
@@ -54,4 +72,34 @@ cookie-pot also understands request responses that includes a headers key that l
             'HASH=f5c8;Path=/;Expires=Thu, 01-Dec-2022 10:23:42 UTC',
         ],
     },
+```
+
+## Axios example
+
+```js
+const axios = require('axios');
+const CookiePot = require('cookie-pot');
+
+const pot = new CookiePot();
+
+const signinUrl = `https://www.example.com/Account/SignIn`;
+const signinPage = await axios.get(signinUrl);
+
+pot.deposit(signinPage);
+
+const requestVerificationToken = pot.getCookie('Antiforgery');
+const signinPayload = `email=example%40example.com&Password=12345&__RequestVerificationToken=${requestVerificationToken}`;
+
+const signinResponse = await axios.post(signinUrl, signinPayload, {
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': pot.getCookieString(),
+    },
+    maxRedirects: 0,
+    validateStatus: (status) => {
+        return status >= 200 && status < 400;
+    },
+});
+
+pot.deposit(signinResponse);
 ```
