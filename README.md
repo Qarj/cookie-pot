@@ -73,3 +73,33 @@ CookiePot also understands request responses that includes a headers key that lo
         ],
     },
 ```
+
+## Axios example
+
+```js
+const axios = require('axios');
+const CookiePot = require('cookie-pot');
+
+const pot = new CookiePot();
+
+const signinUrl = `https://www.example.com/Account/SignIn`;
+const signinPage = await axios.get(signinUrl);
+
+pot.deposit(signinPage);
+
+const requestVerificationToken = pot.getCookie('Antiforgery');
+const signinPayload = `email=example%40example.com&Password=12345&__RequestVerificationToken=${requestVerificationToken}`;
+
+const signinResponse = await axios.post(signinUrl, signinPayload, {
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': pot.getCookieString(),
+    },
+    maxRedirects: 0,
+    validateStatus: (status) => {
+        return status >= 200 && status < 400;
+    },
+});
+
+pot.deposit(signinResponse);
+```
