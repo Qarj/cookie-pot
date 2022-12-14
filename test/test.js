@@ -143,4 +143,12 @@ describe('cookie-pot', function () {
         expect(pot.getCookie('Antiforgery')).to.equal('xyz');
         expect(pot.getCookie('Newone')).to.equal('');
     });
+
+    it('can build a pot from a cookie string', function () {
+        const cookieString = pot.deposit(requestResponse1);
+        const pot2 = new CookiePot();
+        pot2.buildPotFromCookieString(cookieString);
+        expect(pot2.getCookieString()).to.equal(cookieString);
+        expect(pot2.getCookie('X-TOKEN')).to.equal('pjb');
+    });
 });

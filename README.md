@@ -42,6 +42,14 @@ To clear the contents of the cookie pot
 pot.clear();
 ```
 
+A cookie pot can be built from an existing cookie string (will wipe the existing content)
+
+```js
+const cookieString = 'id=2a9; X-TOKEN=pjb; .AspNetCore.Antiforgery.nUm79WDWtTU=xyz; LANG=de';
+const pot = new CookiePot();
+pot.buildPotFromCookieString(cookieString);
+```
+
 ## Supported responses
 
 CookiePot currently understands response header strings that look like

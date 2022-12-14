@@ -50,6 +50,10 @@ class CookiePot {
         return '';
     }
 
+    getCookieString() {
+        return this.buildCookieString();
+    }
+
     normaliseHeaders(headers) {
         const type = typeof headers;
         if (type === 'string') {
@@ -117,7 +121,7 @@ class CookiePot {
             let name = this.eatName();
             this.eatEquals();
             let value = this.eatValue();
-            pot.push({ name, value });
+            this.pot.push({ name, value });
             this.eatSemicolon();
         }
     }
