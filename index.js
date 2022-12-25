@@ -69,6 +69,10 @@ class CookiePot {
         return '';
     }
 
+    setCookie(name, value) {
+        this.#potPush(name, value);
+    }
+
     get cookieString() {
         return this.#buildCookieString();
     }

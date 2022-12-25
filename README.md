@@ -50,6 +50,18 @@ const pot = new CookiePot();
 pot.buildPotFromCookieString(cookieString);
 ```
 
+To set or overwrite a cookie value
+
+```js
+pot.setCookie('myCookie', '123');
+```
+
+To remove a cookie, set it to the empty string
+
+```js
+pot.setCookie('myCookie', '');
+```
+
 ## Supported responses
 
 CookiePot currently understands response header strings that look like

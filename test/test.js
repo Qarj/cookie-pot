@@ -160,4 +160,25 @@ describe('cookie-pot', function () {
         const cookieString = pot.deposit(header5);
         expect(cookieString).to.contain('Newone=amaze');
     });
+
+    it('can set a new cookie', function () {
+        pot.deposit(header1);
+        pot.setCookie('new', 'power=5');
+        expect(pot.cookieString).to.contain('new=power=5');
+    });
+
+    it('can overwrite an existing cookie', function () {
+        pot.deposit(header1);
+        expect(pot.cookieString).to.contain('LoginCookie=cwZ1');
+        pot.setCookie('LoginCookie', 'abcd');
+        expect(pot.cookieString).to.not.contain('LoginCookie=cwZ1');
+        expect(pot.cookieString).to.contain('LoginCookie=abcd');
+    });
+
+    it('can delete a cookie', function () {
+        pot.deposit(header1);
+        expect(pot.cookieString).to.contain('LoginCookie=cwZ1');
+        pot.setCookie('LoginCookie', '');
+        expect(pot.cookieString).to.not.contain('LoginCookie');
+    });
 });
