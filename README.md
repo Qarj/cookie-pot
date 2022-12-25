@@ -4,7 +4,7 @@
 ![Tests](https://github.com/Qarj/cookie-pot/workflows/Tests/badge.svg)
 ![Publish to npmjs](https://github.com/Qarj/cookie-pot/workflows/Publish%20to%20npmjs/badge.svg)
 
-Cookie jar style helper function for Node.js HTTP requests
+Cookie jar style helper function for Node.js HTTP requests to assist test and development of services.
 
 ## Usage
 
@@ -60,6 +60,19 @@ To remove a cookie, set it to the empty string
 
 ```js
 pot.setCookie('myCookie', '');
+```
+
+To build a cookie pot from request headers copied and pasted from the browser
+
+```js
+const requestHeader = `Accept-Language
+	en-GB,en;q=0.5
+Cookie
+	VIS_ID=123; _abck=234~0~YAAQ/0; SessionCookie=345; MY_COOKIE=PCY; amaze=34=34; last=1
+	1
+Host
+	www.example.com`;
+pot.addPossibleCookies(requestHeader);
 ```
 
 ## Supported responses

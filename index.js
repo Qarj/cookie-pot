@@ -6,6 +6,31 @@ class CookiePot {
         this.text = '';
     }
 
+    addPossibleCookies(headers) {
+        headers = headers.replace(/\s/g, ' ');
+        const fragments = headers.split(' ');
+        for (let fragment of fragments) {
+            if (!fragment.includes('=')) continue;
+
+            // remove final semicolon
+            if (fragment[fragment.length - 1] === ';') fragment = fragment.slice(0, -1);
+
+            // only final character can be a semicolon
+            if (fragment.includes(';')) continue;
+
+            // cookie value can contain an equals, but if the last character is an equals, it's not a cookie request header
+            const equals = fragment.split('=');
+            if (equals.length === 1 && fragment[fragment.length - 1] === '=') continue;
+
+            // only split the fragment on the first equals
+            fragment = fragment.split('=');
+            const name = fragment.shift();
+            const value = fragment.join('=');
+
+            this.setCookie(name, value);
+        }
+    }
+
     buildPotFromCookieString(cookieString) {
         if (cookieString.length > 1) {
             cookieString += ';';

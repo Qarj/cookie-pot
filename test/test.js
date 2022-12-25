@@ -181,4 +181,25 @@ describe('cookie-pot', function () {
         pot.setCookie('LoginCookie', '');
         expect(pot.cookieString).to.not.contain('LoginCookie');
     });
+
+    it('can set cookies from the request header string', function () {
+        const requestHeader = `Accept-Language
+	en-GB,en;q=0.5
+Connection
+	keep-alive
+Cookie
+	VIS_ID=123; _abck=234~0~YAAQ/0; SessionCookie=345; MY_COOKIE=PCY; amaze=34=34; last=1
+	1
+Host
+	www.example.com
+Sec-Fetch-Dest
+	image`;
+        pot.addPossibleCookies(requestHeader);
+        expect(pot.cookieString).to.contain('VIS_ID=123');
+        expect(pot.cookieString).to.contain('SessionCookie=345');
+        expect(pot.cookieString).to.contain('MY_COOKIE=PCY');
+        expect(pot.cookieString).to.contain('amaze=34=34');
+        expect(pot.cookieString).to.contain('last=1');
+        expect(pot.cookieString).to.not.contain('q=0.5');
+    });
 });
