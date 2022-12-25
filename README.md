@@ -13,11 +13,11 @@ const CookiePot = require('cookie-pot');
 
 const pot = new CookiePot();
 
-let cookieString = pot.deposit(response1);
+const cookieString = pot.deposit(response1);
 pot.deposit(response2);
 pot.deposit(response3);
 
-pot.getCookieString();
+const updatedCookieString = pot.cookieString;
 ```
 
 CookiePot will
@@ -26,7 +26,7 @@ CookiePot will
 -   update the values of existing cookies
 -   remove cookies if the value is set to the empty string
 
-The `cookieString` string returned by the `deposit` and `getCookieString` methods can be used for the `cookie` request header verbatim.
+The cookie string string returned by the `deposit()` method and the `cookieString` property can be used for the `Cookie` request header verbatim.
 
 To get a single cookie value from the cookiePot
 
@@ -93,7 +93,7 @@ const signinPayload = `email=example%40example.com&Password=12345&__RequestVerif
 const signinResponse = await axios.post(signinUrl, signinPayload, {
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Cookie': pot.getCookieString(),
+        'Cookie': pot.cookieString,
     },
     maxRedirects: 0,
     validateStatus: (status) => {
@@ -129,7 +129,7 @@ try {
         .post(signinUrl)
         .redirects(0)
         .set('Content-Type', 'application/x-www-form-urlencoded')
-        .set('Cookie', pot.getCookieString())
+        .set('Cookie', pot.cookieString)
         .set('User-Agent', userAgent)
         .send(signinPayload);
 } catch (error) {

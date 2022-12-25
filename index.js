@@ -69,7 +69,7 @@ class CookiePot {
         return '';
     }
 
-    getCookieString() {
+    get cookieString() {
         return this.#buildCookieString();
     }
 

@@ -152,7 +152,7 @@ describe('cookie-pot', function () {
         const cookieString = pot.deposit(requestResponse1);
         const pot2 = new CookiePot();
         pot2.buildPotFromCookieString(cookieString);
-        expect(pot2.getCookieString()).to.equal(cookieString);
+        expect(pot2.cookieString).to.equal(cookieString);
         expect(pot2.getCookie('X-TOKEN')).to.equal('pjb');
     });
 
