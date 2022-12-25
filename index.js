@@ -69,7 +69,11 @@ class CookiePot {
         return '';
     }
 
-    getCookieString() {
+    setCookie(name, value) {
+        this.#potPush(name, value);
+    }
+
+    get cookieString() {
         return this.#buildCookieString();
     }
 
@@ -177,15 +181,16 @@ class CookiePot {
             value += this.text[this.pos];
             this.pos += 1;
         }
-        throw `Cookie value must end with a semicolon at position ${this.pos}.`;
+        return value; // end of string
     }
 
     #eatSemicolon() {
+        // optional
         if (this.text[this.pos] === ';') {
             this.pos += 1;
             return;
         }
-        throw `Expected semicolon at position ${this.pos}.`;
+        return;
     }
 
     #buildCookieString() {

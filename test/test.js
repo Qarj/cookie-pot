@@ -36,6 +36,10 @@ set-cookie: Newone=amaze; path=/; secure`;
 
 const header4 = `server-timing: edge; dur=178`;
 
+const header5 = `server-timing: edge; dur=178
+set-cookie: AUTH=123; path=/; secure; httponly
+set-cookie: Newone=amaze`;
+
 const requestResponse1 = {
     headers: {
         'date': 'Wed, 01 Dec 2021 10:23:43 GMT',
@@ -148,7 +152,33 @@ describe('cookie-pot', function () {
         const cookieString = pot.deposit(requestResponse1);
         const pot2 = new CookiePot();
         pot2.buildPotFromCookieString(cookieString);
-        expect(pot2.getCookieString()).to.equal(cookieString);
+        expect(pot2.cookieString).to.equal(cookieString);
         expect(pot2.getCookie('X-TOKEN')).to.equal('pjb');
+    });
+
+    it('can cope with set cookie header responses that do not end with a semi colon', function () {
+        const cookieString = pot.deposit(header5);
+        expect(cookieString).to.contain('Newone=amaze');
+    });
+
+    it('can set a new cookie', function () {
+        pot.deposit(header1);
+        pot.setCookie('new', 'power=5');
+        expect(pot.cookieString).to.contain('new=power=5');
+    });
+
+    it('can overwrite an existing cookie', function () {
+        pot.deposit(header1);
+        expect(pot.cookieString).to.contain('LoginCookie=cwZ1');
+        pot.setCookie('LoginCookie', 'abcd');
+        expect(pot.cookieString).to.not.contain('LoginCookie=cwZ1');
+        expect(pot.cookieString).to.contain('LoginCookie=abcd');
+    });
+
+    it('can delete a cookie', function () {
+        pot.deposit(header1);
+        expect(pot.cookieString).to.contain('LoginCookie=cwZ1');
+        pot.setCookie('LoginCookie', '');
+        expect(pot.cookieString).to.not.contain('LoginCookie');
     });
 });
