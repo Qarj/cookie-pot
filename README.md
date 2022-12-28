@@ -66,12 +66,12 @@ To build a cookie pot from request headers copied and pasted from the browser
 
 ```js
 const requestHeader = `Accept-Language
-	en-GB,en;q=0.5
+    en-GB,en;q=0.5
 Cookie
-	VIS_ID=123; _abck=234~0~YAAQ/0; SessionCookie=345; MY_COOKIE=PCY; amaze=34=34; last=1
-	1
+    VIS_ID=123; _abck=234~0~YAAQ/0; SessionCookie=345; MY_COOKIE=PCY; amaze=34=34; last=1
+    1
 Host
-	www.example.com`;
+    www.example.com`;
 pot.addPossibleCookies(requestHeader);
 ```
 
