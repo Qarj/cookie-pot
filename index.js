@@ -113,17 +113,16 @@ class CookiePot {
         throw `Headers object of ${type} is not supported.`;
     }
 
-    #normaliseObjectHeaders(headers) {
-        if (headers.hasOwnProperty('headers')) {
-            return this.#stringifyRequestResponseHeaders(headers);
-        }
-        throw 'Headers object is unknown and not supported.';
+    #normaliseObjectHeaders(response) {
+        if (response.hasOwnProperty('headers')) {
+            return this.#stringifyRequestResponseHeaders(response.headers);
+        } else return this.#stringifyRequestResponseHeaders(response);
     }
 
     #stringifyRequestResponseHeaders(headers) {
         let stringified = '';
-        if (headers.headers.hasOwnProperty('set-cookie')) {
-            const setCookie = headers.headers['set-cookie'];
+        if (headers.hasOwnProperty('set-cookie')) {
+            const setCookie = headers['set-cookie'];
             for (const cookie of setCookie) {
                 stringified += 'set-cookie: ' + cookie;
             }

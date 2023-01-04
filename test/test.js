@@ -67,6 +67,14 @@ const requestResponse2 = {
     },
 };
 
+const nodeFetchResponseHeaders1 = {
+    'date': 'Wed, 01 Dec 2021 10:23:43 GMT',
+    'set-cookie': [
+        'VISIT_ID=0b0d; Path=/ ; Max-Age=31536000',
+        '.AspNetCore.Antiforgery.nUm79WDWtTU=CfDJ0MM; path=/; samesite=strict; httponly',
+    ],
+};
+
 describe('cookie-pot', function () {
     it('finds a cookie name', function () {
         expect(pot.deposit(header1)).to.contain('LoginCookie=');
@@ -201,5 +209,11 @@ Sec-Fetch-Dest
         expect(pot.cookieString).to.contain('amaze=34=34');
         expect(pot.cookieString).to.contain('last=1');
         expect(pot.cookieString).to.not.contain('q=0.5');
+    });
+
+    it('can handle a node fetch response ', function () {
+        pot.deposit(nodeFetchResponseHeaders1);
+        expect(pot.cookieString).to.contain('VISIT_ID=0b0d');
+        expect(pot.cookieString).to.contain('.AspNetCore.Antiforgery.nUm79WDWtTU=CfDJ0MM');
     });
 });
