@@ -185,7 +185,7 @@ async function login() {
     pot.deposit(response.headers.raw());
 
     const requestVerificationToken = pot.getCookie('Antiforgery');
-    const signinPayload = `Form.Email=username%40example.com&Form.Password=password123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
+    const signinPayload = `Form.Email=username%40example.com&Form.Password=pass123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
     options = {
         method: 'POST',
         headers: {
@@ -204,3 +204,40 @@ async function login() {
 To install `node-fetch`, put `"type": "module"` in your `package.json` and run `npm install node-fetch`.
 
 To stop `node-fetch` following redirects, set `redirect: 'manual'` in the options.
+
+## got example
+
+```js
+import CookiePot from 'cookie-pot';
+import got from 'got';
+
+login();
+
+async function login() {
+    const signinUrl = `https://www.example.com/Account/SignIn`;
+    const userAgent =
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.4472.114 Safari/537.36';
+
+    let response;
+    response = await got(signinUrl, { headers: { 'User-Agent': userAgent } });
+    let pot = new CookiePot();
+    pot.deposit(response);
+
+    const requestVerificationToken = pot.getCookie('Antiforgery');
+    const signinPayload = `Form.Email=username%40example.com&Form.Password=pass123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
+    response = await got.post(signinUrl, {
+        headers: {
+            'User-Agent': userAgent,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cookie': pot.cookieString,
+        },
+        body: signinPayload,
+        followRedirect: false,
+    });
+    pot.deposit(response.headers);
+}
+```
+
+To install `got`, put `"type": "module"` in your `package.json` and run `npm install got`.
+
+To stop `got` following redirects, set `followRedirect: false` in the options.
