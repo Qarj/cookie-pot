@@ -105,29 +105,41 @@ CookiePot also understands request responses that includes a headers key that lo
 const axios = require('axios');
 const CookiePot = require('cookie-pot');
 
-const pot = new CookiePot();
+login();
 
-const signinUrl = `https://www.example.com/Account/SignIn`;
-const signinPage = await axios.get(signinUrl);
+async function login() {
+    const url = `https://www.example.com/Account/SignIn`;
+    const userAgent =
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.4472.114 Safari/537.36';
 
-pot.deposit(signinPage);
+    let options;
+    let response;
+    options = { headers: { 'User-Agent': userAgent } };
+    response = await axios.get(url, options);
+    let pot = new CookiePot();
+    pot.deposit(response.headers);
 
-const requestVerificationToken = pot.getCookie('Antiforgery');
-const signinPayload = `email=example%40example.com&Password=12345&__RequestVerificationToken=${requestVerificationToken}`;
-
-const signinResponse = await axios.post(signinUrl, signinPayload, {
-    headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Cookie': pot.cookieString,
-    },
-    maxRedirects: 0,
-    validateStatus: (status) => {
-        return status >= 200 && status < 400;
-    },
-});
-
-pot.deposit(signinResponse);
+    const requestVerificationToken = pot.getCookie('Antiforgery');
+    const signinPayload = `Form.Email=username%40example.com&Form.Password=pass123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
+    options = {
+        data: signinPayload,
+        method: 'POST',
+        headers: {
+            'User-Agent': userAgent,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cookie': pot.cookieString,
+        },
+        maxRedirects: 0,
+        validateStatus: (status) => {
+            return status >= 200 && status < 400;
+        },
+    };
+    response = await axios(url, options);
+    pot.deposit(response.headers);
+}
 ```
+
+With Axios in addition to setting `maxRedirects: 0` you have to supply a `validateStatus` function that returns true for 3xx status codes otherwise Axios will throw an error.
 
 ## Superagent example
 
