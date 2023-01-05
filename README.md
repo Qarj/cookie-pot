@@ -117,7 +117,7 @@ async function login() {
     options = { headers: { 'User-Agent': userAgent } };
     response = await axios.get(url, options);
     let pot = new CookiePot();
-    pot.deposit(response.headers);
+    pot.deposit(response);
 
     const requestVerificationToken = pot.getCookie('Antiforgery');
     const signinPayload = `Form.Email=username%40example.com&Form.Password=pass123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
@@ -135,46 +135,48 @@ async function login() {
         },
     };
     response = await axios(url, options);
-    pot.deposit(response.headers);
+    pot.deposit(response);
 }
 ```
 
 With Axios in addition to setting `maxRedirects: 0` you have to supply a `validateStatus` function that returns true for 3xx status codes otherwise Axios will throw an error.
 
-## Superagent example
+## SuperAgent example
 
 ```js
 const superagent = require('superagent');
 const CookiePot = require('cookie-pot');
 
-const pot = new CookiePot();
+login();
 
-const signinUrl = `https://www.example.com/Account/SignIn`;
-const userAgent = 'My User Agent';
-const signinPage = await superagent.get(signinUrl).set('User-Agent', userAgent);
+async function login() {
+    const url = `https://www.example.com/Account/SignIn`;
+    const userAgent =
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.4472.114 Safari/537.36';
 
-pot.deposit(signinPage);
+    let response;
+    let pot = new CookiePot();
+    response = await superagent.get(url).set('User-Agent', userAgent);
+    pot.deposit(response);
 
-const requestVerificationToken = pot.getCookie('Antiforgery');
-const signinPayload = `email=example%40example.com&Password=12345&__RequestVerificationToken=${requestVerificationToken}`;
-
-// superagent treats a redirect as an error, we need to catch it since the login cookies
-// are only set in the redirect response and not the final response
-let signinResponse;
-try {
-    signinResponse = await superagent
-        .post(signinUrl)
-        .redirects(0)
-        .set('Content-Type', 'application/x-www-form-urlencoded')
-        .set('Cookie', pot.cookieString)
-        .set('User-Agent', userAgent)
-        .send(signinPayload);
-} catch (error) {
-    signinResponse = error.response;
+    const requestVerificationToken = pot.getCookie('Antiforgery');
+    const signinPayload = `Form.Email=username%40example.com&Form.Password=pass123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
+    try {
+        response = await superagent
+            .post(url)
+            .redirects(0)
+            .set('User-Agent', userAgent)
+            .set('Content-Type', 'application/x-www-form-urlencoded')
+            .set('Cookie', pot.cookieString)
+            .send(signinPayload);
+    } catch (error) {
+        response = error.response;
+    }
+    pot.deposit(response);
 }
-
-pot.deposit(signinResponse);
 ```
+
+With SuperAgent you set `redirects(0)` so you can see the 3xx response headers, but it will also throw an error. You have to catch the error and get the response from the error object.
 
 ## node-fetch example
 
