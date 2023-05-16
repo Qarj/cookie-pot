@@ -238,8 +238,17 @@ Sec-Fetch-Dest
         expect(pot.cookieString).to.contain('__Host-X-PROFILE-CSRF-SECRET=twD');
     });
 
+    function createObjectWithHeadersSymbol(headers) {
+        const headersSymbol = Symbol('headers');
+        const obj = {
+            [headersSymbol]: headers,
+        };
+        return obj;
+    }
+
     it('can handle a node fetch response - simulate pass in of response', function () {
-        pot.deposit({ headers: nativeFetchMockHeaders1 });
+        const response = createObjectWithHeadersSymbol(nativeFetchMockHeaders1);
+        pot.deposit(response);
         expect(pot.cookieString).to.contain('__Host-X-PROFILE-CSRF-SECRET=twD');
     });
 });

@@ -116,6 +116,8 @@ class CookiePot {
     #normaliseObjectHeaders(response) {
         if (response.hasOwnProperty('headers')) {
             return this.#stringifyRequestResponseHeaders(response.headers);
+        } else if (hasHeadersSymbol(response)) {
+            return this.#stringifyRequestResponseHeaders(response[getHeadersSymbol(response)]);
         } else return this.#stringifyRequestResponseHeaders(response);
     }
 
@@ -238,6 +240,26 @@ class CookiePot {
     world() {
         return 'hello';
     }
+}
+
+function hasHeadersSymbol(obj) {
+    const symbols = Object.getOwnPropertySymbols(obj);
+    for (const symbol of symbols) {
+        if (symbol.description === 'headers') {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getHeadersSymbol(obj) {
+    const symbols = Object.getOwnPropertySymbols(obj);
+    for (const symbol of symbols) {
+        if (symbol.description === 'headers') {
+            return symbol;
+        }
+    }
+    return null;
 }
 
 module.exports = CookiePot;
