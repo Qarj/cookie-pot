@@ -219,6 +219,48 @@ To install `node-fetch`, put `"type": "module"` in your `package.json` and run `
 
 To stop `node-fetch` following redirects, set `redirect: 'manual'` in the options.
 
+## native node fetch (v18+) example
+
+```js
+import CookiePot from 'cookie-pot';
+
+login();
+
+async function login() {
+    const url = `https://www.example.com/Account/SignIn`;
+    const userAgent =
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36';
+
+    let options;
+    let response;
+    options = { headers: { 'User-Agent': userAgent } };
+    response = await fetch(url, options);
+    let pot = new CookiePot();
+    pot.deposit(response);
+
+    const requestVerificationToken = pot.getCookie('Antiforgery');
+    const signinPayload = `Form.Email=example%40example.com&Form.Password=pass123&Form.RememberMe=true&__RequestVerificationToken=${requestVerificationToken}&Form.RememberMe=true`;
+    options = {
+        method: 'POST',
+        headers: {
+            'User-Agent': userAgent,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cookie': pot.cookieString,
+        },
+        body: signinPayload,
+        redirect: 'manual',
+    };
+    response = await fetch(url, options);
+    if (response.status !== 302) {
+        console.log(`Login failed: ${response.status} ${response.statusText}`);
+        return;
+    }
+    console.log(`Login successful: ${response.status} ${response.statusText}`);
+    pot.deposit(response);
+    console.log(pot.cookieString);
+}
+```
+
 ## got example
 
 ```js

@@ -127,6 +127,13 @@ class CookiePot {
                 stringified += 'set-cookie: ' + cookie;
             }
         }
+        if (typeof headers.entries === 'function') {
+            // native fetch
+            for (const [key, value] of headers.entries()) {
+                stringified += `${key}: ${value}\n`;
+            }
+        }
+
         return stringified;
     }
 

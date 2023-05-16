@@ -3,6 +3,7 @@ const chai = require('chai'); // https://www.chaijs.com/
 var expect = chai.expect;
 const CookiePot = require('../index');
 let pot;
+const { inspect } = require('util');
 
 beforeEach(function () {
     pot = new CookiePot();
@@ -67,13 +68,34 @@ const requestResponse2 = {
     },
 };
 
-const nodeFetchResponseHeaders1 = {
-    'date': 'Wed, 01 Dec 2021 10:23:43 GMT',
-    'set-cookie': [
-        'VISIT_ID=0b0d; Path=/ ; Max-Age=31536000',
-        '.AspNetCore.Antiforgery.nUm79WDWtTU=CfDJ0MM; path=/; samesite=strict; httponly',
-    ],
+class MockHeaders {
+    constructor(headers) {
+        this.headersMap = new Map(Object.entries(headers));
+    }
+
+    get(name) {
+        return this.headersMap.get(name);
+    }
+
+    set(name, value) {
+        this.headersMap.set(name, value);
+    }
+
+    entries() {
+        return this.headersMap.entries();
+    }
+
+    [Symbol.iterator]() {
+        return this.entries();
+    }
+}
+
+const headersData1 = {
+    'content-type': 'text/html; charset=utf-8',
+    'set-cookie': '__Host-X-PROFILE-CSRF-SECRET=twD; Max-Age=300; Path=/; Secure; SameSite=Strict',
 };
+
+const nativeFetchMockHeaders1 = new MockHeaders(headersData1);
 
 describe('cookie-pot', function () {
     it('finds a cookie name', function () {
@@ -211,9 +233,13 @@ Sec-Fetch-Dest
         expect(pot.cookieString).to.not.contain('q=0.5');
     });
 
-    it('can handle a node fetch response ', function () {
-        pot.deposit(nodeFetchResponseHeaders1);
-        expect(pot.cookieString).to.contain('VISIT_ID=0b0d');
-        expect(pot.cookieString).to.contain('.AspNetCore.Antiforgery.nUm79WDWtTU=CfDJ0MM');
+    it('can handle a node fetch response - simulate pass in of response.headers', function () {
+        pot.deposit(nativeFetchMockHeaders1);
+        expect(pot.cookieString).to.contain('__Host-X-PROFILE-CSRF-SECRET=twD');
+    });
+
+    it('can handle a node fetch response - simulate pass in of response', function () {
+        pot.deposit({ headers: nativeFetchMockHeaders1 });
+        expect(pot.cookieString).to.contain('__Host-X-PROFILE-CSRF-SECRET=twD');
     });
 });
