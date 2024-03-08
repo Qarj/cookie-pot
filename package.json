@@ -1,6 +1,6 @@
 {
     "name": "cookie-pot",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "description": "Cookie jar style helper function for node HTTP requests to assist testing services",
     "main": "index.js",
     "scripts": {
@@ -24,6 +24,7 @@
     "homepage": "https://github.com/Qarj/cookie-pot#readme",
     "devDependencies": {
         "chai": "^4.3.4",
+        "eslint": "^8.57.0",
         "mocha": "^9.1.3"
     }
 }
