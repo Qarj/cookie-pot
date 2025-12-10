@@ -45,10 +45,7 @@ jobs:
       - name: Read package name and version
         id: read_meta
         run: |
-          echo "PKG_NAME=$(node -p \"require('./package.json').name\")" >> "$GITHUB_ENV"
-          echo "PKG_VERSION=$(node -p \"require('./package.json').version\")" >> "$GITHUB_ENV"
-          echo "pkg_name=$PKG_NAME" >> "$GITHUB_OUTPUT"
-          echo "pkg_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+          node -e "const pkg=require('./package.json');const fs=require('fs');fs.appendFileSync(process.env.GITHUB_ENV, `PKG_NAME=${pkg.name}\nPKG_VERSION=${pkg.version}\n`);fs.appendFileSync(process.env.GITHUB_OUTPUT, `pkg_name=${pkg.name}\npkg_version=${pkg.version}\n`);"
       - name: Get published version from npm
         id: get_published
         run: |
@@ -81,6 +78,11 @@ jobs:
           echo "npm before update: $(npm -v || true)"
           npm install -g npm@latest
           echo "npm after update: $(npm -v)"
+      - name: Prefer OIDC over legacy token
+        if: steps.decide.outputs.should_publish == 'true'
+        run: |
+          echo "Clearing NODE_AUTH_TOKEN to ensure OIDC is used"
+          echo "NODE_AUTH_TOKEN=" >> "$GITHUB_ENV"
       - run: npm install
         if: steps.decide.outputs.should_publish == 'true'
       - run: npm run build --if-present
