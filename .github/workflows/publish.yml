@@ -45,19 +45,22 @@ jobs:
       - name: Read package name and version
         id: read_meta
         run: |
-          node -e "const pkg=require('./package.json');const fs=require('fs');fs.appendFileSync(process.env.GITHUB_ENV, `PKG_NAME=${pkg.name}\nPKG_VERSION=${pkg.version}\n`);fs.appendFileSync(process.env.GITHUB_OUTPUT, `pkg_name=${pkg.name}\npkg_version=${pkg.version}\n`);"
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "PKG_NAME=$PKG_NAME" >> "$GITHUB_ENV"
+          echo "PKG_VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
       - name: Get published version from npm
         id: get_published
         run: |
           set +e
-          PUBLISHED="$(npm view \"${{ steps.read_meta.outputs.pkg_name }}\" version 2>/dev/null || echo '')"
+          PUBLISHED="$(npm view \"${{ env.PKG_NAME }}\" version 2>/dev/null || echo '')"
           set -e
           echo "published_version=$PUBLISHED" >> "$GITHUB_OUTPUT"
       - name: Decide whether to publish
         id: decide
         run: |
-          echo "pkg_name=${{ steps.read_meta.outputs.pkg_name }}"
-          echo "pkg_version=${{ steps.read_meta.outputs.pkg_version }}"
+          echo "pkg_name=${{ env.PKG_NAME }}"
+          echo "pkg_version=${{ env.PKG_VERSION }}"
           echo "published_version=${{ steps.get_published.outputs.published_version }}"
           SHOULD="false"
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -67,7 +70,7 @@ jobs:
           elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             SHOULD="true"
           elif [[ "${{ github.event_name }}" == "push" ]] && ([[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]); then
-            if [[ "${{ steps.read_meta.outputs.pkg_version }}" != "${{ steps.get_published.outputs.published_version }}" ]]; then
+            if [[ "${{ env.PKG_VERSION }}" != "${{ steps.get_published.outputs.published_version }}" ]]; then
               SHOULD="true"
             fi
           fi
