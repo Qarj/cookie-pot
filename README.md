@@ -1,7 +1,6 @@
 # cookie-pot
 
 ![Tests](https://github.com/Qarj/cookie-pot/workflows/Tests/badge.svg)
-![Publish to npmjs](https://github.com/Qarj/cookie-pot/workflows/Publish%20to%20npmjs/badge.svg)
 
 Cookie jar style helper function for Node.js HTTP requests to assist test and development of services.
 
