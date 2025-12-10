@@ -4,7 +4,7 @@ Options for publishing
 
 Option A: just push
 
--   Edit the version in other-projects/cookie-pot/package.json (or use npm to bump without tagging).
+-   Edit the version in package.json (or use npm to bump without tagging).
 -   Commit and push to main/master. The workflow checks local package.json version vs npm’s current version, and only publishes when they differ.
 
 Example:
@@ -28,7 +28,7 @@ This bumps the version, creates the tag, and a single push sends both the commit
 
 Option C: Manual tag-based release (intentional publish)
 
-Edit other-projects/cookie-pot/package.json version manually:
+Edit package.json version manually:
 
 ```sh
 git commit -am "cookie-pot: bump to x.y.z"
